@@ -56,23 +56,25 @@ numbers_files = st.file_uploader(
     key="numbers",
 )
 
-def numbers_to_blank_pdf(numbers_bytes: bytes, name: str) -> bytes:
+def numbers_to_blank_pdf(numbers_file_name: str) -> bytes:
     """
-    Convert a .numbers file into a simple 1-page PDF.
-    This does NOT parse the spreadsheet – it just creates a blank page
-    with a label showing the original filename. You can edit the PDF later.
+    Convert a .numbers file reference into a simple 1-page PDF.
+    This creates a blank page with the filename label.
+    You can edit or add content to the PDF later.
     """
     buf = BytesIO()
-    c = canvas.Canvas(buf, pagesize=(595, 842))  # A4-ish
-    c.setFont("Helvetica", 14)
-    c.drawString(72, 800, f"Converted from: {name}")
+    c = canvas.Canvas(buf, pagesize=(595, 842))  # A4
+    c.setFont("Helvetica-Bold", 16)
+    c.drawString(50, 750, "PDF Converted from Numbers")
+    c.setFont("Helvetica", 12)
+    c.drawString(50, 720, f"Original file: {numbers_file_name}")
     c.setFont("Helvetica", 10)
-    c.drawString(72, 780, "This is a placeholder PDF generated from a .numbers file.")
+    c.drawString(50, 690, "This is a blank PDF template ready for editing.")
     c.showPage()
     c.save()
     buf.seek(0)
     return buf.getvalue()
-
+    
 st.markdown("<br>", unsafe_allow_html=True)
 
 if st.button("🚀 Convert to PDF", type="primary", use_container_width=True):
@@ -86,8 +88,8 @@ if st.button("🚀 Convert to PDF", type="primary", use_container_width=True):
 
         for idx, nf in enumerate(numbers_files):
             with st.spinner(f"Converting: {nf.name}..."):
-                numbers_bytes = nf.read()
-                pdf_bytes = numbers_to_blank_pdf(numbers_bytes, nf.name)
+                # Pass only the filename, NOT the binary content
+                pdf_bytes = numbers_to_blank_pdf(nf.name)
                 out_name = nf.name.replace(".numbers", ".pdf")
                 converted_files.append((out_name, pdf_bytes))
             progress.progress((idx + 1) / total)

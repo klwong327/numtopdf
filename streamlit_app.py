@@ -120,4 +120,3 @@ if st.button("🚀 Convert to PDF", type="primary", use_container_width=True):
 
 st.markdown("---")
 st.markdown("🌐 Ready for deployment on Streamlit Cloud.")
-[file:1]
